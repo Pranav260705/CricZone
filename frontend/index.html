@@ -6,29 +6,55 @@
     <title>Cricket Players</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
     <script src="app.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
+        body { font-family: Arial, sans-serif; }
         .container { width: 80%; margin: auto; }
         .player-card { border: 1px solid #ccc; padding: 15px; margin: 10px; display: inline-block; width: 250px; }
         .btn { padding: 8px 15px; cursor: pointer; }
         .add-btn { background-color: blue; color: white; }
         .delete { background-color: red; color: white; }
+        .navbar { margin-bottom: 20px; }
+        .search-container { margin: 20px 0; }
     </style>
 </head>
-<body ng-controller="CricketController">
-    <h1>Cricket Players Management</h1>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">CricZone</a>
+            <div class="navbar-nav ms-auto" ng-controller="AuthController">
+                <span class="nav-item nav-link" ng-if="isAuthenticated()">
+                    Welcome, {{getUser().username}}!
+                    <button class="btn btn-outline-light ms-2" ng-click="logout()">Logout</button>
+                </span>
+                <a class="nav-item nav-link" ng-if="!isAuthenticated()" href="login.html">Login</a>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container">
-        <input type="text" ng-model="searchText" placeholder="Search Player Name">
-        <button class="btn add-btn" onclick="location.href='add-player.html'">Add New Player</button>
+    <!-- Main Content -->
+    <div class="container" ng-controller="CricketController">
+        <h1 class="text-center mb-4">Cricket Players Management</h1>
 
-        <h2>Players List</h2>
-        <div ng-repeat="player in players | filter:searchText" class="player-card">
-            <img ng-src="{{player.profileUrl}}" alt="{{player.name}}" width="100">
-            <h3>{{player.name}} ({{player.role}})</h3>
-            <p>Total Runs: {{player.runs}}</p>
-            <p>Matches Played: {{player.matches}}</p>
-            <button class="btn delete" ng-click="deletePlayer(player._id)">Delete</button>
+        <div class="search-container">
+            <div class="input-group">
+                <input type="text" class="form-control" ng-model="searchText" placeholder="Search Player Name">
+                <button class="btn btn-primary" onclick="location.href='add-player.html'">Add New Player</button>
+            </div>
+        </div>
+
+        <h2 class="text-center mb-4">Players List</h2>
+        <div class="row">
+            <div class="col-md-4" ng-repeat="player in players | filter:searchText">
+                <div class="player-card">
+                    <img ng-src="{{player.profileUrl}}" alt="{{player.name}}" width="100" class="img-fluid rounded">
+                    <h3>{{player.name}} ({{player.role}})</h3>
+                    <p>Total Runs: {{player.runs}}</p>
+                    <p>Matches Played: {{player.matches}}</p>
+                    <button class="btn btn-danger" ng-click="deletePlayer(player._id)">Delete</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>
