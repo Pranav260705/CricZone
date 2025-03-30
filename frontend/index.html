@@ -10,12 +10,36 @@
     <style>
         body { font-family: Arial, sans-serif; }
         .container { width: 80%; margin: auto; }
-        .player-card { border: 1px solid #ccc; padding: 15px; margin: 10px; display: inline-block; width: 250px; }
+        .player-card { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin: 10px; 
+            display: inline-block; 
+            width: 250px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
         .btn { padding: 8px 15px; cursor: pointer; }
         .add-btn { background-color: blue; color: white; }
         .delete { background-color: red; color: white; }
         .navbar { margin-bottom: 20px; }
         .search-container { margin: 20px 0; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .stat-item {
+            background: #f8f9fa;
+            padding: 5px;
+            border-radius: 4px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -47,15 +71,73 @@
         <h2 class="text-center mb-4">Players List</h2>
         <div class="row">
             <div class="col-md-4" ng-repeat="player in players | filter:searchText">
-                <div class="player-card">
+                <div class="player-card" ng-click="openPlayerProfile(player)">
                     <img ng-src="{{player.profileUrl}}" alt="{{player.name}}" width="100" class="img-fluid rounded">
-                    <h3>{{player.name}} ({{player.role}})</h3>
-                    <p>Total Runs: {{player.runs}}</p>
-                    <p>Matches Played: {{player.matches}}</p>
-                    <button class="btn btn-danger" ng-click="deletePlayer(player._id)">Delete</button>
+                    <h3>{{player.name}}</h3>
+                    <p class="text-muted">{{player.role}} | {{player.team}}</p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <strong>Runs:</strong> {{player.runs}}
+                        </div>
+                        <div class="stat-item">
+                            <strong>Wickets:</strong> {{player.wickets}}
+                        </div>
+                        <div class="stat-item">
+                            <strong>Matches:</strong> {{player.matches}}
+                        </div>
+                        <div class="stat-item">
+                            <strong>Nationality:</strong> {{player.nationality}}
+                        </div>
+                    </div>
+                    <button class="btn btn-danger mt-2" ng-click="$event.stopPropagation(); deletePlayer(player._id)">Delete</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Player Profile Modal -->
+    <div class="modal fade" id="playerProfileModal" tabindex="-1" aria-labelledby="playerProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="playerProfileModalLabel">Player Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" ng-if="selectedPlayer">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img ng-src="{{selectedPlayer.profileUrl}}" alt="{{selectedPlayer.name}}" class="img-fluid rounded mb-3" style="max-width: 200px;">
+                        </div>
+                        <div class="col-md-8">
+                            <h3>{{selectedPlayer.name}}</h3>
+                            <p class="text-muted">{{selectedPlayer.role}} | {{selectedPlayer.team}}</p>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Career Statistics</h5>
+                                    <p><strong>Matches:</strong> {{selectedPlayer.matches}}</p>
+                                    <p><strong>Runs:</strong> {{selectedPlayer.runs}}</p>
+                                    <p><strong>Wickets:</strong> {{selectedPlayer.wickets}}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Personal Information</h5>
+                                    <p><strong>Nationality:</strong> {{selectedPlayer.nationality}}</p>
+                                    <p><strong>Team:</strong> {{selectedPlayer.team}}</p>
+                                    <p><strong>Role:</strong> {{selectedPlayer.role}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

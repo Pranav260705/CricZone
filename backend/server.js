@@ -33,7 +33,10 @@ const PlayerSchema = new mongoose.Schema({
     name: String,
     role: String,
     runs: Number,
+    wickets: Number,
     matches: Number,
+    team: String,
+    nationality: String,
     profileUrl: String
 });
 
@@ -163,6 +166,19 @@ app.put("/players/:id", authenticateToken, async (req, res) => {
         res.json(updatedPlayer);
     } catch (error) {
         res.status(500).json({ error: "Failed to update player" });
+    }
+});
+
+// Get player by ID
+app.get("/players/:id", authenticateToken, async (req, res) => {
+    try {
+        const player = await Player.findById(req.params.id);
+        if (!player) {
+            return res.status(404).json({ error: "Player not found" });
+        }
+        res.json(player);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch player" });
     }
 });
 
