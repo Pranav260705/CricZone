@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="CricketApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Players</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .container { width: 80%; margin: auto; }
+        .player-card { border: 1px solid #ccc; padding: 15px; margin: 10px; display: inline-block; width: 250px; }
+        .btn { padding: 8px 15px; cursor: pointer; }
+        .add-btn { background-color: blue; color: white; }
+        .delete { background-color: red; color: white; }
+    </style>
+</head>
+<body ng-controller="CricketController">
+    <h1>Cricket Players Management</h1>
+
+    <div class="container">
+        <input type="text" ng-model="searchText" placeholder="Search Player Name">
+        <button class="btn add-btn" onclick="location.href='add-player.html'">Add New Player</button>
+
+        <h2>Players List</h2>
+        <div ng-repeat="player in players | filter:searchText" class="player-card">
+            <img ng-src="{{player.profileUrl}}" alt="{{player.name}}" width="100">
+            <h3>{{player.name}} ({{player.role}})</h3>
+            <p>Total Runs: {{player.runs}}</p>
+            <p>Matches Played: {{player.matches}}</p>
+            <button class="btn delete" ng-click="deletePlayer(player._id)">Delete</button>
+        </div>
+    </div>
+</body>
+</html>
