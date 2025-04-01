@@ -4,12 +4,34 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:5500', 'http://127.0.0.1:5001', 'http://localhost:5001', 'http://127.0.0.1:5003'],
+    credentials: true
+}));
 app.use(bodyParser.json());
+app.use(cookieParser());
+
+// Serve static files from the frontend directory
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Session configuration
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // Set to true if using HTTPS
+        httpOnly: true,
+        maxAge: 10 * 60 * 1000 // 10 minutes
+    }
+}));
 
 // Connect to MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/cricketDB", {
@@ -44,20 +66,10 @@ const Player = mongoose.model("Player", PlayerSchema);
 
 // Authentication Middleware
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
+    if (!req.session.user) {
         return res.status(401).json({ error: "Access token required" });
     }
-
-    jwt.verify(token, 'your-secret-key', (err, user) => {
-        if (err) {
-            return res.status(403).json({ error: "Invalid token" });
-        }
-        req.user = user;
-        next();
-    });
+    next();
 };
 
 // Auth Routes
@@ -85,12 +97,15 @@ app.post("/auth/signup", async (req, res) => {
 
         await user.save();
 
-        // Create token
-        const token = jwt.sign({ id: user._id }, 'your-secret-key', { expiresIn: '24h' });
+        // Set session
+        req.session.user = {
+            id: user._id,
+            username: user.username,
+            email: user.email
+        };
 
         res.status(201).json({
             message: "User created successfully",
-            token,
             user: {
                 id: user._id,
                 username: user.username,
@@ -119,12 +134,15 @@ app.post("/auth/login", async (req, res) => {
             return res.status(400).json({ error: "Invalid credentials" });
         }
 
-        // Create token
-        const token = jwt.sign({ id: user._id }, 'your-secret-key', { expiresIn: '24h' });
+        // Set session
+        req.session.user = {
+            id: user._id,
+            username: user.username,
+            email: user.email
+        };
 
         res.json({
             message: "Login successful",
-            token,
             user: {
                 id: user._id,
                 username: user.username,
@@ -133,6 +151,26 @@ app.post("/auth/login", async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ error: "Failed to login" });
+    }
+});
+
+// Logout
+app.post("/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ error: "Failed to logout" });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ message: "Logged out successfully" });
+    });
+});
+
+// Check session
+app.get("/auth/check-session", (req, res) => {
+    if (req.session.user) {
+        res.json({ user: req.session.user });
+    } else {
+        res.status(401).json({ error: "No active session" });
     }
 });
 
@@ -190,6 +228,11 @@ app.delete("/players/:id", authenticateToken, async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: "Failed to delete player" });
     }
+});
+
+// Add a catch-all route to serve index.html for all other routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // Start Server
