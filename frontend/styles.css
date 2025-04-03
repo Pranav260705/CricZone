@@ -1,0 +1,62 @@
+/* Live Matches Styles */
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.match-details {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.team-score {
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.card-text {
+    color: #666;
+}
+
+.alert-info {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+}
+
+/* Live Match Specific Styles */
+.live-match {
+    border-left: 4px solid #dc3545;
+}
+
+.live-match .card-title {
+    color: #dc3545;
+}
+
+/* Upcoming Match Specific Styles */
+.upcoming-match {
+    border-left: 4px solid #28a745;
+}
+
+.upcoming-match .card-title {
+    color: #28a745;
+}
+
+/* Section Spacing */
+.mb-5 {
+    margin-bottom: 3rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+} 

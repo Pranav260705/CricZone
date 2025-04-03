@@ -1,4 +1,4 @@
-var app = angular.module("CricketApp", []);
+var app = angular.module("criczone", []);
 
 // Update the API URL to use the same server
 const API_URL = 'http://localhost:5000';
@@ -93,14 +93,14 @@ app.controller("AuthController", function($scope, AuthService) {
     // Check session on load
     AuthService.checkSession()
         .then(() => {
-            // Only redirect to login if we're not already on the login page
+            // Only redirect to live-matches if we're on the login page
             if (window.location.pathname.includes('login.html')) {
-                window.location.href = 'index.html';
+                window.location.href = 'live-matches.html';
             }
         })
         .catch(() => {
-            // Only redirect to login if we're not already on the login page
-            if (!window.location.pathname.includes('login.html')) {
+            // Only redirect to login if we're not on the login page and not authenticated
+            if (!window.location.pathname.includes('login.html') && !AuthService.isAuthenticated()) {
                 window.location.href = 'login.html';
             }
         });
@@ -258,7 +258,7 @@ app.controller("LoginController", function($scope, AuthService) {
                 console.log('Login successful, redirecting...');
                 // Check if user is set before redirecting
                 if (AuthService.isAuthenticated()) {
-                    window.location.href = "index.html";
+                    window.location.href = "live-matches.html";
                 } else {
                     alert("Login successful but session not established");
                 }
@@ -273,9 +273,125 @@ app.controller("LoginController", function($scope, AuthService) {
     AuthService.checkSession()
         .then(() => {
             console.log('Already logged in, redirecting...');
-            window.location.href = "index.html";
+            window.location.href = "live-matches.html";
         })
         .catch(() => {
             console.log('Not logged in, showing login form');
         });
+});
+
+// Live Matches Service
+app.service("LiveMatchesService", function($http) {
+    var service = this;
+    const API_KEY = '2ed65e8becmsh4fcaefb3800823dp18e1ebjsn35a6149faa80';
+    const API_HOST = 'cricket-live-line1.p.rapidapi.com';
+    const IPL_SERIES_ID = 470;
+
+    service.getLiveMatches = function() {
+        return $http({
+            method: 'GET',
+            url: 'https://cricket-live-line1.p.rapidapi.com/liveMatches',
+            headers: {
+                'x-rapidapi-key': API_KEY,
+                'x-rapidapi-host': API_HOST
+            }
+        }).then(function(response) {
+            console.log('Raw live matches response:', response.data);
+            // Filter for IPL matches only and handle the new data structure
+            if (response.data && response.data.data) {
+                const filteredMatches = response.data.data.filter(match => {
+                    console.log('Checking match:', match);
+                    return match.series_id === IPL_SERIES_ID;
+                });
+                console.log('Filtered live matches:', filteredMatches);
+                return filteredMatches;
+            }
+            return [];
+        });
+    };
+
+    service.getUpcomingMatches = function() {
+        return $http({
+            method: 'GET',
+            url: 'https://cricket-live-line1.p.rapidapi.com/upcomingMatches',
+            headers: {
+                'x-rapidapi-key': API_KEY,
+                'x-rapidapi-host': API_HOST
+            }
+        }).then(function(response) {
+            console.log('Raw upcoming matches response:', response.data);
+            // Filter for IPL matches only
+            if (response.data && response.data.data) {
+                const filteredMatches = response.data.data.filter(match => {
+                    console.log('Checking match:', match);
+                    return match.series_id === IPL_SERIES_ID;
+                });
+                console.log('Filtered upcoming matches:', filteredMatches);
+                response.data.data = filteredMatches;
+            }
+            return response;
+        });
+    };
+});
+
+// Live Matches Controller
+app.controller("LiveMatchesController", function($scope, LiveMatchesService, AuthService) {
+    $scope.liveMatches = [];
+    $scope.upcomingMatches = [];
+    $scope.isAuthenticated = AuthService.isAuthenticated;
+    $scope.getUser = AuthService.getUser;
+    $scope.logout = AuthService.logout;
+
+    // Check authentication and load matches
+    function initialize() {
+        AuthService.checkSession()
+            .then(() => {
+                // User is authenticated, load matches
+                loadLiveMatches();
+                loadUpcomingMatches();
+            })
+            .catch(() => {
+                // User is not authenticated, redirect to login
+                window.location.href = 'login.html';
+            });
+    }
+
+    // Load live matches
+    function loadLiveMatches() {
+        LiveMatchesService.getLiveMatches()
+            .then(function(matches) {
+                console.log('Final live matches data:', matches);
+                $scope.liveMatches = matches;
+            })
+            .catch(function(error) {
+                console.error('Error loading live matches:', error);
+                alert("Error loading live matches. Please try again later.");
+            });
+    }
+
+    // Load upcoming matches
+    function loadUpcomingMatches() {
+        LiveMatchesService.getUpcomingMatches()
+            .then(function(response) {
+                console.log('Final upcoming matches data:', response.data);
+                if (response.data && response.data.data) {
+                    $scope.upcomingMatches = response.data.data;
+                } else {
+                    $scope.upcomingMatches = [];
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading upcoming matches:', error);
+                alert("Error loading upcoming matches. Please try again later.");
+            });
+    }
+
+    // Refresh matches every 5 minutes
+    setInterval(function() {
+        loadLiveMatches();
+        loadUpcomingMatches();
+    }, 300000);
+
+    // Initialize the controller
+    initialize();
 });
