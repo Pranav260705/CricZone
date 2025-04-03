@@ -8,185 +8,113 @@
         .match-card {
             border: 1px solid #ddd;
             border-radius: 8px;
-            padding: 15px;
+            padding: 20px;
             margin-bottom: 20px;
             background-color: #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .match-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .match-status {
-            font-weight: bold;
-            color: #28a745;
-        }
-        .match-teams {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .team {
-            text-align: center;
-            flex: 1;
+        .team-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
         }
         .team-name {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin: 10px 0;
         }
-        .team-short {
-            color: #666;
-            font-size: 0.9em;
-        }
-        .team-score {
+        .score {
             font-size: 1.2em;
-            color: #333;
+            margin: 5px 0;
         }
-        .vs {
-            margin: 0 15px;
-            color: #666;
-        }
-        .match-info {
-            margin-top: 10px;
+        .overs {
             color: #666;
             font-size: 0.9em;
         }
-        .match-venue {
-            margin-top: 5px;
-            color: #888;
-        }
-        .upcoming-match {
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-        }
-        .match-time {
+        .match-status {
             color: #dc3545;
             font-weight: bold;
-        }
-        .team-img {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 5px;
-        }
-        .match-date {
-            color: #666;
-            font-size: 0.9em;
-        }
-        .match-number {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 5px;
+            margin: 10px 0;
         }
         .toss-info {
             color: #666;
-            font-style: italic;
-            margin-top: 5px;
+            font-size: 0.9em;
+            margin: 5px 0;
         }
         .current-inning {
             color: #28a745;
             font-weight: bold;
-            margin-top: 5px;
+            margin: 5px 0;
+        }
+        .venue {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body ng-controller="LiveMatchesController">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">CricZone</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="live-matches.html">Live Matches</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item" ng-if="isAuthenticated()">
-                        <span class="nav-link">Welcome, {{getUser().username}}</span>
-                    </li>
-                    <li class="nav-item" ng-if="isAuthenticated()">
-                        <a class="nav-link" href="#" ng-click="logout()">Logout</a>
-                    </li>
-                    <li class="nav-item" ng-if="!isAuthenticated()">
-                        <a class="nav-link" href="login.html">Login</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <!-- Include the shared navbar -->
+    <div ng-include="'navbar.html'"></div>
 
     <div class="container mt-4">
-        <!-- Live Matches Section - Only show if there are live matches -->
+        <!-- Live Matches Section -->
         <div ng-if="liveMatches.length > 0">
-            <h2>Live Matches</h2>
+            <h2 class="mb-4">Live Matches</h2>
             <div class="row">
                 <div class="col-md-6" ng-repeat="match in liveMatches">
                     <div class="match-card">
-                        <div class="match-header">
-                            <span class="match-status">LIVE</span>
-                            <span>{{match.match_type}}</span>
-                        </div>
-                        <div class="match-teams">
-                            <div class="team">
-                                <img ng-src="{{match.team_a_img}}" alt="{{match.team_a}}" class="team-img">
-                                <div class="team-name">{{match.team_a}}</div>
-                                <div class="team-short">{{match.team_a_short}}</div>
-                                <div class="team-score">{{match.team_a_scores || 'Yet to bat'}}</div>
-                                <div ng-if="match.team_a_over" class="team-over">({{match.team_a_over}} ov)</div>
+                        <div class="row">
+                            <div class="col-5 text-center">
+                                <img ng-src="{{match.team_a_img}}" alt="{{match.team_a_name}}" class="team-logo">
+                                <div class="team-name">{{match.team_a_name}}</div>
+                                <div class="score">{{match.team_a_scores}}</div>
+                                <div class="overs" ng-if="match.team_a_overs">Overs: {{match.team_a_overs}}</div>
                             </div>
-                            <div class="vs">VS</div>
-                            <div class="team">
-                                <img ng-src="{{match.team_b_img}}" alt="{{match.team_b}}" class="team-img">
-                                <div class="team-name">{{match.team_b}}</div>
-                                <div class="team-short">{{match.team_b_short}}</div>
-                                <div class="team-score">{{match.team_b_scores || 'Yet to bat'}}</div>
-                                <div ng-if="match.team_b_over" class="team-over">({{match.team_b_over}} ov)</div>
+                            <div class="col-2 text-center d-flex align-items-center justify-content-center">
+                                <div class="vs">VS</div>
+                            </div>
+                            <div class="col-5 text-center">
+                                <img ng-src="{{match.team_b_img}}" alt="{{match.team_b_name}}" class="team-logo">
+                                <div class="team-name">{{match.team_b_name}}</div>
+                                <div class="score">{{match.team_b_scores}}</div>
+                                <div class="overs" ng-if="match.team_b_overs">Overs: {{match.team_b_overs}}</div>
                             </div>
                         </div>
-                        <div class="match-info">
-                            <div class="current-inning">Innings {{match.current_inning}}</div>
-                            <div ng-if="match.toss" class="toss-info">{{match.toss}}</div>
-                            <div class="match-venue">{{match.venue}}</div>
-                            <div class="match-number">{{match.matchs}}</div>
+                        <div class="text-center">
+                            <div class="current-inning" ng-if="match.current_inning">
+                                {{match.current_inning}}
+                            </div>
+                            <div class="toss-info" ng-if="match.toss">
+                                {{match.toss}}
+                            </div>
+                            <div class="venue">{{match.venue}}</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <h2 class="mt-4">Upcoming Matches</h2>
+        <!-- Upcoming Matches Section -->
+        <h2 class="mb-4">Upcoming Matches</h2>
         <div class="row">
             <div class="col-md-6" ng-repeat="match in upcomingMatches">
-                <div class="match-card upcoming-match">
-                    <div class="match-header">
-                        <span class="match-time">{{match.match_time}}</span>
-                        <span>{{match.match_type}}</span>
-                    </div>
-                    <div class="match-teams">
-                        <div class="team">
-                            <img ng-src="{{match.team_a_img}}" alt="{{match.team_a}}" class="team-img">
-                            <div class="team-name">{{match.team_a}}</div>
-                            <div class="team-short">{{match.team_a_short}}</div>
+                <div class="match-card">
+                    <div class="row">
+                        <div class="col-5 text-center">
+                            <img ng-src="{{match.team_a_img}}" alt="{{match.team_a_name}}" class="team-logo">
+                            <div class="team-name">{{match.team_a_name}}</div>
                         </div>
-                        <div class="vs">VS</div>
-                        <div class="team">
-                            <img ng-src="{{match.team_b_img}}" alt="{{match.team_b}}" class="team-img">
-                            <div class="team-name">{{match.team_b}}</div>
-                            <div class="team-short">{{match.team_b_short}}</div>
+                        <div class="col-2 text-center d-flex align-items-center justify-content-center">
+                            <div class="vs">VS</div>
+                        </div>
+                        <div class="col-5 text-center">
+                            <img ng-src="{{match.team_b_img}}" alt="{{match.team_b_name}}" class="team-logo">
+                            <div class="team-name">{{match.team_b_name}}</div>
                         </div>
                     </div>
-                    <div class="match-info">
-                        <div class="match-date">{{match.date_wise}}</div>
-                        <div class="match-venue">{{match.venue}}</div>
-                        <div class="match-number">{{match.matchs}}</div>
+                    <div class="text-center">
+                        <div class="match-status">{{match.match_status}}</div>
+                        <div class="venue">{{match.venue}}</div>
                     </div>
                 </div>
             </div>

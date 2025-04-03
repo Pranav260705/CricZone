@@ -283,7 +283,7 @@ app.controller("LoginController", function($scope, AuthService) {
 // Live Matches Service
 app.service("LiveMatchesService", function($http) {
     var service = this;
-    const API_KEY = '2ed65e8becmsh4fcaefb3800823dp18e1ebjsn35a6149faa80';
+    const API_KEY = '7fd9d9bf9amsh4fec798748ad712p13418fjsnbba51642c868';
     const API_HOST = 'cricket-live-line1.p.rapidapi.com';
     const IPL_SERIES_ID = 470;
 
@@ -394,4 +394,33 @@ app.controller("LiveMatchesController", function($scope, LiveMatchesService, Aut
 
     // Initialize the controller
     initialize();
+});
+
+// Points Table Controller
+app.controller("PointsTableController", function($scope, $http) {
+    $scope.teams = [];
+
+    function loadPointsTable() {
+        const settings = {
+            url: 'https://cricket-live-line1.p.rapidapi.com/series/470/pointsTable',
+            method: 'GET',
+            headers: {
+                'x-rapidapi-key': '7fd9d9bf9amsh4fec798748ad712p13418fjsnbba51642c868',
+                'x-rapidapi-host': 'cricket-live-line1.p.rapidapi.com'
+            }
+        };
+
+        $http(settings)
+            .then(function(response) {
+                if (response.data && response.data.data && response.data.data.A) {
+                    $scope.teams = response.data.data.A;
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading points table:', error);
+            });
+    }
+
+    // Load points table on page load
+    loadPointsTable();
 });
