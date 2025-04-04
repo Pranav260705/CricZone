@@ -32,6 +32,22 @@
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" required>
                 </div>
+                <div class="mb-3">
+                    <label for="favoriteTeam" class="form-label">Favorite Team</label>
+                    <select class="form-control" id="favoriteTeam" required>
+                        <option value="">Select your favorite team</option>
+                        <option value="29">Chennai Super Kings (CSK)</option>
+                        <option value="33">Rajasthan Royals (RR)</option>
+                        <option value="28">Royal Challengers Bengaluru (RCB)</option>
+                        <option value="154">Gujarat Titans (GT)</option>
+                        <option value="31">SunRisers Hyderabad (SRH)</option>
+                        <option value="155">Lucknow Super Giants (LSG)</option>
+                        <option value="34">Punjab Kings (PBKS)</option>
+                        <option value="30">Delhi Capitals (DC)</option>
+                        <option value="27">Mumbai Indians (MI)</option>
+                        <option value="32">Kolkata Knight Riders (KKR)</option>
+                    </select>
+                </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">Sign Up</button>
                 </div>
@@ -50,6 +66,7 @@
             const username = document.getElementById('username').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const favoriteTeam = parseInt(document.getElementById('favoriteTeam').value);
             const errorMessage = document.getElementById('errorMessage');
 
             try {
@@ -59,7 +76,7 @@
                         'Content-Type': 'application/json'
                     },
                     credentials: 'include',
-                    body: JSON.stringify({ username, email, password })
+                    body: JSON.stringify({ username, email, password, favoriteTeam })
                 });
 
                 const data = await response.json();

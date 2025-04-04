@@ -1,124 +1,165 @@
 <!DOCTYPE html>
 <html ng-app="criczone">
-<head>
+  <head>
     <title>Live Matches - CricZone</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
     <style>
-        .match-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .team-logo {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-        }
-        .team-name {
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .score {
-            font-size: 1.2em;
-            margin: 5px 0;
-        }
-        .overs {
-            color: #666;
-            font-size: 0.9em;
-        }
-        .match-status {
-            color: #dc3545;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .toss-info {
-            color: #666;
-            font-size: 0.9em;
-            margin: 5px 0;
-        }
-        .current-inning {
-            color: #28a745;
-            font-weight: bold;
-            margin: 5px 0;
-        }
-        .venue {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
+      .match-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .team-logo {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+      }
+      .team-name {
+        font-weight: bold;
+        margin: 10px 0;
+      }
+      .score {
+        font-size: 1.2em;
+        margin: 5px 0;
+      }
+      .overs {
+        color: #666;
+        font-size: 0.9em;
+      }
+      .match-status {
+        color: #dc3545;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+      .toss-info {
+        color: #666;
+        font-size: 0.9em;
+        margin: 5px 0;
+      }
+      .current-inning {
+        color: #28a745;
+        font-weight: bold;
+        margin: 5px 0;
+      }
+      .venue {
+        color: #666;
+        font-size: 0.9em;
+        margin-top: 10px;
+      }
+      .match-date {
+        color: #007bff;
+        font-weight: bold;
+        margin: 5px 0;
+      }
+      .match-time {
+        color: #666;
+        font-size: 0.9em;
+      }
     </style>
-</head>
-<body ng-controller="LiveMatchesController">
+  </head>
+  <body ng-controller="LiveMatchesController">
     <!-- Include the shared navbar -->
     <div ng-include="'navbar.html'"></div>
 
     <div class="container mt-4">
-        <!-- Live Matches Section -->
-        <div ng-if="liveMatches.length > 0">
-            <h2 class="mb-4">Live Matches</h2>
-            <div class="row">
-                <div class="col-md-6" ng-repeat="match in liveMatches">
-                    <div class="match-card">
-                        <div class="row">
-                            <div class="col-5 text-center">
-                                <img ng-src="{{match.team_a_img}}" alt="{{match.team_a_name}}" class="team-logo">
-                                <div class="team-name">{{match.team_a_name}}</div>
-                                <div class="score">{{match.team_a_scores}}</div>
-                                <div class="overs" ng-if="match.team_a_overs">Overs: {{match.team_a_overs}}</div>
-                            </div>
-                            <div class="col-2 text-center d-flex align-items-center justify-content-center">
-                                <div class="vs">VS</div>
-                            </div>
-                            <div class="col-5 text-center">
-                                <img ng-src="{{match.team_b_img}}" alt="{{match.team_b_name}}" class="team-logo">
-                                <div class="team-name">{{match.team_b_name}}</div>
-                                <div class="score">{{match.team_b_scores}}</div>
-                                <div class="overs" ng-if="match.team_b_overs">Overs: {{match.team_b_overs}}</div>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <div class="current-inning" ng-if="match.current_inning">
-                                {{match.current_inning}}
-                            </div>
-                            <div class="toss-info" ng-if="match.toss">
-                                {{match.toss}}
-                            </div>
-                            <div class="venue">{{match.venue}}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Upcoming Matches Section -->
-        <h2 class="mb-4">Upcoming Matches</h2>
+      <!-- Live Matches Section -->
+      <div ng-if="liveMatches.length > 0">
+        <h2 class="mb-4">Live Matches</h2>
         <div class="row">
-            <div class="col-md-6" ng-repeat="match in upcomingMatches">
-                <div class="match-card">
-                    <div class="row">
-                        <div class="col-5 text-center">
-                            <img ng-src="{{match.team_a_img}}" alt="{{match.team_a_name}}" class="team-logo">
-                            <div class="team-name">{{match.team_a_name}}</div>
-                        </div>
-                        <div class="col-2 text-center d-flex align-items-center justify-content-center">
-                            <div class="vs">VS</div>
-                        </div>
-                        <div class="col-5 text-center">
-                            <img ng-src="{{match.team_b_img}}" alt="{{match.team_b_name}}" class="team-logo">
-                            <div class="team-name">{{match.team_b_name}}</div>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <div class="match-status">{{match.match_status}}</div>
-                        <div class="venue">{{match.venue}}</div>
-                    </div>
+          <div class="col-md-6" ng-repeat="match in liveMatches">
+            <div class="match-card">
+              <div class="row">
+                <div class="col-5 text-center">
+                  <img
+                    ng-src="{{match.team_a_img}}"
+                    alt="{{match.team_a_name}}"
+                    class="team-logo"
+                  />
+                  <div class="team-name">{{match.team_a_name}}</div>
+                  <div class="score">{{match.team_a_scores}}</div>
+                  <div class="overs" ng-if="match.team_a_overs">
+                    Overs: {{match.team_a_overs}}
+                  </div>
                 </div>
+                <div
+                  class="col-2 text-center d-flex align-items-center justify-content-center"
+                >
+                  <div class="vs">VS</div>
+                </div>
+                <div class="col-5 text-center">
+                  <img
+                    ng-src="{{match.team_b_img}}"
+                    alt="{{match.team_b_name}}"
+                    class="team-logo"
+                  />
+                  <div class="team-name">{{match.team_b_name}}</div>
+                  <div class="score">{{match.team_b_scores}}</div>
+                  <div class="overs" ng-if="match.team_b_overs">
+                    Overs: {{match.team_b_overs}}
+                  </div>
+                </div>
+              </div>
+              <div class="text-center">
+                <div class="current-inning" ng-if="match.current_inning">
+                  {{match.current_inning}}
+                </div>
+                <div class="toss-info" ng-if="match.toss">{{match.toss}}</div>
+                <div class="venue">{{match.venue}}</div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Upcoming Matches Section -->
+      <h2 class="mb-4">Upcoming Matches</h2>
+      <div class="row">
+        <div class="col-md-6" ng-repeat="match in upcomingMatches">
+          <div class="match-card">
+            <div class="text-center">
+              <div class="match-date">{{match.date_wise}}</div>
+              <div class="match-time">{{match.match_time}}</div>
+            </div>
+            <div class="row">
+              <div class="col-5 text-center">
+                <img
+                  ng-src="{{match.team_a_img}}"
+                  alt="{{match.team_a_name}}"
+                  class="team-logo"
+                />
+                <div class="team-name">{{match.team_a_name}}</div>
+              </div>
+              <div
+                class="col-2 text-center d-flex align-items-center justify-content-center"
+              >
+                <div class="vs">VS</div>
+              </div>
+              <div class="col-5 text-center">
+                <img
+                  ng-src="{{match.team_b_img}}"
+                  alt="{{match.team_b_name}}"
+                  class="team-logo"
+                />
+                <div class="team-name">{{match.team_b_name}}</div>
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="match-status">{{match.match_status}}</div>
+              <div class="venue">{{match.venue}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -126,5 +167,5 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="app.js"></script>
-</body>
-</html> 
+  </body>
+</html>

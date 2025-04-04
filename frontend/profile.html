@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html ng-app="criczone">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - CricZone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+    <style>
+        .profile-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            background-color: #fff;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 50px;
+            color: #6c757d;
+        }
+        .profile-info {
+            margin-top: 30px;
+        }
+        .profile-info-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .profile-info-label {
+            font-weight: bold;
+            color: #6c757d;
+        }
+        /* Team logo styles from temp.html */
+        .vn-team-logo {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .vn-team-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .ap-team-contn {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .team-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        .team-link:hover {
+            transform: scale(1.05);
+            text-decoration: none;
+            color: inherit;
+        }
+        .team-link:hover .ap-team-contn h3 {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body ng-controller="ProfileController">
+    <!-- Include the shared navbar -->
+    <div ng-include="'navbar.html'"></div>
+
+    <div class="container">
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2>{{user.username}}</h2>
+                <p class="text-muted">{{user.email}}</p>
+            </div>
+
+            <div class="profile-info">
+                <div class="profile-info-item">
+                    <div class="profile-info-label">Favorite Team</div>
+                    <a href="team-profile.html?teamId={{user.favoriteTeam}}" class="team-link">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <div class="vn-team-logo">
+                                <img ng-src="{{getTeamLogoUrl(user.favoriteTeam)}}" alt="{{getTeamName(user.favoriteTeam)}}">
+                            </div>
+                            <div class="ap-team-contn col-100">
+                                <h3 class="mb-0">{{getTeamName(user.favoriteTeam)}}</h3>
+                                <p class="text-muted">Click to view team profile</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

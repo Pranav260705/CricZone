@@ -45,6 +45,11 @@ const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    favoriteTeam: { 
+        type: Number, 
+        enum: [29, 33, 28, 154, 31, 155, 34, 30, 27, 32], // CSK, RR, RCB, GT, SRH, LSG, PBKS, DC, MI, KKR
+        required: true 
+    },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -76,7 +81,7 @@ const authenticateToken = (req, res, next) => {
 // Signup
 app.post("/auth/signup", async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, favoriteTeam } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -92,7 +97,8 @@ app.post("/auth/signup", async (req, res) => {
         const user = new User({
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            favoriteTeam
         });
 
         await user.save();
@@ -101,7 +107,8 @@ app.post("/auth/signup", async (req, res) => {
         req.session.user = {
             id: user._id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            favoriteTeam: user.favoriteTeam
         };
 
         res.status(201).json({
@@ -109,7 +116,8 @@ app.post("/auth/signup", async (req, res) => {
             user: {
                 id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                favoriteTeam: user.favoriteTeam
             }
         });
     } catch (error) {
@@ -138,7 +146,8 @@ app.post("/auth/login", async (req, res) => {
         req.session.user = {
             id: user._id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            favoriteTeam: user.favoriteTeam
         };
 
         res.json({
@@ -146,7 +155,8 @@ app.post("/auth/login", async (req, res) => {
             user: {
                 id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                favoriteTeam: user.favoriteTeam
             }
         });
     } catch (error) {

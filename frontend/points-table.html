@@ -70,7 +70,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="team in teams | orderBy:['-Pts', '-NRR']" ng-class="{'position-1': $index === 0, 'position-2': $index === 1, 'position-3': $index === 2, 'position-4': $index === 3}">
+                        <tr ng-repeat="team in teams" ng-class="{'position-1': $index === 0, 'position-2': $index === 1, 'position-3': $index === 2, 'position-4': $index === 3}">
                             <td>{{$index + 1}}</td>
                             <td>
                                 <div class="team-name">

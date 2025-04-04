@@ -1,26 +1,31 @@
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" ng-controller="AuthController">
     <div class="container">
-        <a class="navbar-brand" href="live-matches.html">CricZone</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <a class="navbar-brand" href="index.html">CricZone</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="live-matches.html">Live Matches</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="points-table.html">Points Table</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">Players</a>
+                <li class="nav-item" ng-if="isAuthenticated">
+                    <a class="nav-link" href="team-profile.html">Team Profile</a>
                 </li>
             </ul>
             <ul class="navbar-nav">
-                <li class="nav-item" ng-if="isAuthenticated()">
-                    <span class="nav-link">Welcome, {{getUser().username}}</span>
+                <li class="nav-item" ng-if="isAuthenticated">
+                    <a class="nav-link" href="profile.html">
+                        <i class="fas fa-user"></i> {{getUser().username}}
+                    </a>
                 </li>
-                <li class="nav-item" ng-if="isAuthenticated()">
+                <li class="nav-item" ng-if="isAuthenticated">
                     <a class="nav-link" href="#" ng-click="logout()">Logout</a>
                 </li>
                 <li class="nav-item" ng-if="!isAuthenticated()">

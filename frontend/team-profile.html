@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html ng-app="criczone">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Profile - CricZone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+    <style>
+        .team-profile-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            background-color: #fff;
+        }
+        .team-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .team-logo {
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .team-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .match-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .match-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        .match-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .team {
+            text-align: center;
+            flex: 1;
+        }
+        .team-logo-small {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 10px;
+        }
+        .team-logo-small img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .vs {
+            font-weight: bold;
+            color: #6c757d;
+            margin: 0 15px;
+        }
+        .match-result {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .match-venue {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+        .points-table {
+            margin-top: 30px;
+        }
+        .points-table h3 {
+            margin-bottom: 20px;
+        }
+        .table th {
+            background-color: #f8f9fa;
+        }
+        .position-1 {
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        .position-2 {
+            background-color: rgba(192, 192, 192, 0.1);
+        }
+        .position-3 {
+            background-color: rgba(205, 127, 50, 0.1);
+        }
+        .position-4 {
+            background-color: rgba(0, 128, 0, 0.05);
+        }
+        .team-row {
+            font-weight: bold;
+        }
+        .no-matches {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body ng-controller="TeamProfileController">
+    <!-- Include the shared navbar -->
+    <div ng-include="'navbar.html'"></div>
+
+    <div class="container">
+        <div class="team-profile-container">
+            <div class="team-header">
+                <div class="team-logo">
+                    <img ng-src="{{getTeamLogoUrl(teamId)}}" alt="{{getTeamName(teamId)}}">
+                </div>
+                <h2>{{getTeamName(teamId)}}</h2>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <h3>Recent Matches</h3>
+                    <div ng-if="recentMatches.length > 0">
+                        <div class="match-card" ng-repeat="match in recentMatches">
+                            <div class="match-date">
+                                <i class="far fa-calendar-alt"></i> {{match.date_wise}} | {{match.match_time}}
+                            </div>
+                            <div class="match-teams">
+                                <div class="team">
+                                    <div class="team-logo-small">
+                                        <img ng-src="{{match.team_a_img}}" alt="{{match.team_a}}">
+                                    </div>
+                                    <div class="team-name">{{match.team_a}}</div>
+                                    <div class="team-score">{{match.team_a_scores}} ({{match.team_a_over}})</div>
+                                </div>
+                                <div class="vs">VS</div>
+                                <div class="team">
+                                    <div class="team-logo-small">
+                                        <img ng-src="{{match.team_b_img}}" alt="{{match.team_b}}">
+                                    </div>
+                                    <div class="team-name">{{match.team_b}}</div>
+                                    <div class="team-score">{{match.team_b_scores}} ({{match.team_b_over}})</div>
+                                </div>
+                            </div>
+                            <div class="match-result">{{match.result}}</div>
+                            <div class="match-venue">
+                                <i class="fas fa-map-marker-alt"></i> {{match.venue}}
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="recentMatches.length === 0" class="no-matches">
+                        <i class="fas fa-info-circle fa-3x mb-3"></i>
+                        <h4>No recent matches found</h4>
+                        <p>There are no recent matches available for this team.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="points-table">
+                        <h3>Points Table Position</h3>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Pos</th>
+                                    <th>Team</th>
+                                    <th>P</th>
+                                    <th>W</th>
+                                    <th>L</th>
+                                    <th>NRR</th>
+                                    <th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="team in teams" ng-class="{'team-row': team.Team === getTeamName(teamId), 'position-1': $index === 0, 'position-2': $index === 1, 'position-3': $index === 2, 'position-4': $index === 3}">
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{team.Team}}</td>
+                                    <td>{{team.P}}</td>
+                                    <td>{{team.W}}</td>
+                                    <td>{{team.L}}</td>
+                                    <td>{{team.NRR}}</td>
+                                    <td>{{team.Pts}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
