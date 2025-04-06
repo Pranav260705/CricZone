@@ -91,34 +91,17 @@
             color: #6c757d;
             margin-top: 10px;
         }
-        .points-table {
-            margin-top: 30px;
-        }
-        .points-table h3 {
-            margin-bottom: 20px;
-        }
-        .table th {
+        .search-section {
+            margin-bottom: 30px;
+            padding: 20px;
             background-color: #f8f9fa;
-        }
-        .position-1 {
-            background-color: rgba(255, 215, 0, 0.1);
-        }
-        .position-2 {
-            background-color: rgba(192, 192, 192, 0.1);
-        }
-        .position-3 {
-            background-color: rgba(205, 127, 50, 0.1);
-        }
-        .position-4 {
-            background-color: rgba(0, 128, 0, 0.05);
-        }
-        .team-row {
-            font-weight: bold;
+            border-radius: 8px;
         }
         .no-matches {
             text-align: center;
             padding: 30px;
             color: #6c757d;
+            font-style: italic;
         }
     </style>
 </head>
@@ -128,81 +111,77 @@
 
     <div class="container">
         <div class="team-profile-container">
-            <div class="team-header">
-                <div class="team-logo">
-                    <img ng-src="{{getTeamLogoUrl(teamId)}}" alt="{{getTeamName(teamId)}}">
+            <!-- Search Section -->
+            <div class="search-section">
+                <h3 class="mb-4">Search Team Matches</h3>
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <select class="form-select" ng-model="selectedTeamId" ng-change="searchTeamMatches()">
+                            <option value="">Select a team</option>
+                            <option value="29">Chennai Super Kings (CSK)</option>
+                            <option value="33">Rajasthan Royals (RR)</option>
+                            <option value="28">Royal Challengers Bengaluru (RCB)</option>
+                            <option value="154">Gujarat Titans (GT)</option>
+                            <option value="31">SunRisers Hyderabad (SRH)</option>
+                            <option value="155">Lucknow Super Giants (LSG)</option>
+                            <option value="34">Punjab Kings (PBKS)</option>
+                            <option value="30">Delhi Capitals (DC)</option>
+                            <option value="27">Mumbai Indians (MI)</option>
+                            <option value="32">Kolkata Knight Riders (KKR)</option>
+                        </select>
+                    </div>
                 </div>
-                <h2>{{getTeamName(teamId)}}</h2>
             </div>
 
-            <div class="row">
-                <div class="col-md-8">
-                    <h3>Recent Matches</h3>
-                    <div ng-if="recentMatches.length > 0">
-                        <div class="match-card" ng-repeat="match in recentMatches">
-                            <div class="match-date">
-                                <i class="far fa-calendar-alt"></i> {{match.date_wise}} | {{match.match_time}}
-                            </div>
+            <!-- Team Header -->
+            <div class="team-header" ng-if="selectedTeamId">
+                <div class="team-logo">
+                    <img ng-src="{{getTeamLogoUrl(selectedTeamId)}}" alt="{{getTeamName(selectedTeamId)}}">
+                </div>
+                <h2>{{getTeamName(selectedTeamId)}}</h2>
+            </div>
+
+            <!-- Recent Matches Section -->
+            <div ng-if="recentMatches.length > 0">
+                <h3 class="mb-4">Recent Matches</h3>
+                <div class="row">
+                    <div class="col-md-6" ng-repeat="match in recentMatches">
+                        <div class="match-card">
+                            <div class="match-date">{{match.date_wise}}</div>
                             <div class="match-teams">
                                 <div class="team">
                                     <div class="team-logo-small">
-                                        <img ng-src="{{match.team_a_img}}" alt="{{match.team_a}}">
+                                        <img ng-src="{{getTeamLogoUrl(match.team_a_id)}}" alt="{{getTeamName(match.team_a_id)}}">
                                     </div>
-                                    <div class="team-name">{{match.team_a}}</div>
-                                    <div class="team-score">{{match.team_a_scores}} ({{match.team_a_over}})</div>
+                                    <div>{{getTeamName(match.team_a_id)}}</div>
+                                    <div class="score">{{match.team_a_scores || 'Yet to bat'}}</div>
                                 </div>
                                 <div class="vs">VS</div>
                                 <div class="team">
                                     <div class="team-logo-small">
-                                        <img ng-src="{{match.team_b_img}}" alt="{{match.team_b}}">
+                                        <img ng-src="{{getTeamLogoUrl(match.team_b_id)}}" alt="{{getTeamName(match.team_b_id)}}">
                                     </div>
-                                    <div class="team-name">{{match.team_b}}</div>
-                                    <div class="team-score">{{match.team_b_scores}} ({{match.team_b_over}})</div>
+                                    <div>{{getTeamName(match.team_b_id)}}</div>
+                                    <div class="score">{{match.team_b_scores || 'Yet to bat'}}</div>
                                 </div>
                             </div>
-                            <div class="match-result">{{match.result}}</div>
-                            <div class="match-venue">
-                                <i class="fas fa-map-marker-alt"></i> {{match.venue}}
-                            </div>
+                            <div class="match-result" ng-if="match.match_result">{{match.match_result}}</div>
+                            <div class="match-venue">{{match.venue}}</div>
                         </div>
-                    </div>
-                    <div ng-if="recentMatches.length === 0" class="no-matches">
-                        <i class="fas fa-info-circle fa-3x mb-3"></i>
-                        <h4>No recent matches found</h4>
-                        <p>There are no recent matches available for this team.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="points-table">
-                        <h3>Points Table Position</h3>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Pos</th>
-                                    <th>Team</th>
-                                    <th>P</th>
-                                    <th>W</th>
-                                    <th>L</th>
-                                    <th>NRR</th>
-                                    <th>Pts</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="team in teams" ng-class="{'team-row': team.Team === getTeamName(teamId), 'position-1': $index === 0, 'position-2': $index === 1, 'position-3': $index === 2, 'position-4': $index === 3}">
-                                    <td>{{$index + 1}}</td>
-                                    <td>{{team.Team}}</td>
-                                    <td>{{team.P}}</td>
-                                    <td>{{team.W}}</td>
-                                    <td>{{team.L}}</td>
-                                    <td>{{team.NRR}}</td>
-                                    <td>{{team.Pts}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
+            
+            <!-- No Matches Message -->
+            <div class="no-matches" ng-if="selectedTeamId && recentMatches.length === 0">
+                No recent matches found for this team.
+            </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
+</html> 
 </html> 

@@ -303,8 +303,27 @@ app.service("LiveMatchesService", function($http) {
                     console.log('Checking match:', match);
                     return match.series_id === IPL_SERIES_ID;
                 });
-                console.log('Filtered live matches:', filteredMatches);
-                return filteredMatches;
+                
+                // Map the data to match the expected structure in the HTML
+                const mappedMatches = filteredMatches.map(match => {
+                    return {
+                        team_a_name: match.team_a_name || match.team_a || 'Team A',
+                        team_b_name: match.team_b_name || match.team_b || 'Team B',
+                        team_a_img: match.team_a_img || getTeamLogoUrl(match.team_a_id),
+                        team_b_img: match.team_b_img || getTeamLogoUrl(match.team_b_id),
+                        team_a_scores: match.team_a_scores || 'Yet to bat',
+                        team_b_scores: match.team_b_scores || 'Yet to bat',
+                        team_a_overs: match.team_a_overs,
+                        team_b_overs: match.team_b_overs,
+                        current_inning: match.current_inning,
+                        toss: match.toss,
+                        venue: match.venue,
+                        match_status: match.match_status
+                    };
+                });
+                
+                console.log('Mapped live matches:', mappedMatches);
+                return mappedMatches;
             }
             return [];
         });
@@ -326,12 +345,45 @@ app.service("LiveMatchesService", function($http) {
                     console.log('Checking match:', match);
                     return match.series_id === IPL_SERIES_ID;
                 });
-                console.log('Filtered upcoming matches:', filteredMatches);
-                response.data.data = filteredMatches;
+                
+                // Map the data to match the expected structure in the HTML
+                const mappedMatches = filteredMatches.map(match => {
+                    return {
+                        team_a_name: match.team_a_name || match.team_a || 'Team A',
+                        team_b_name: match.team_b_name || match.team_b || 'Team B',
+                        team_a_img: match.team_a_img || getTeamLogoUrl(match.team_a_id),
+                        team_b_img: match.team_b_img || getTeamLogoUrl(match.team_b_id),
+                        date_wise: match.date_wise,
+                        match_time: match.match_time,
+                        match_status: match.match_status,
+                        venue: match.venue
+                    };
+                });
+                
+                console.log('Mapped upcoming matches:', mappedMatches);
+                return { data: { data: mappedMatches } };
             }
-            return response;
+            return { data: { data: [] } };
         });
     };
+    
+    // Helper function to get team logo URL based on team ID
+    function getTeamLogoUrl(teamId) {
+        const teamLogos = {
+            29: 'images/csk.png',
+            33: 'images/rr.png',
+            28: 'images/rcb.png',
+            154: 'images/gt.png',
+            31: 'images/srh.png',
+            155: 'images/lsg.png',
+            34: 'images/pbks.png',
+            30: 'images/dc.png',
+            27: 'images/mi.png',
+            32: 'images/kkr.png'
+        };
+        
+        return teamLogos[teamId] || 'images/default-team.png';
+    }
 });
 
 // Live Matches Controller
@@ -532,9 +584,8 @@ app.controller("ProfileController", function($scope, AuthService) {
 
 // Team Profile Controller
 app.controller("TeamProfileController", function($scope, $http, $location, AuthService) {
-    $scope.teamId = null;
+    $scope.selectedTeamId = null;
     $scope.recentMatches = [];
-    $scope.teams = [];
     $scope.isAuthenticated = AuthService.isAuthenticated;
     $scope.getUser = AuthService.getUser;
     $scope.logout = AuthService.logout;
@@ -543,22 +594,15 @@ app.controller("TeamProfileController", function($scope, $http, $location, AuthS
     function initialize() {
         AuthService.checkSession()
             .then(() => {
-                // User is authenticated, get team ID from URL or user's favorite team
+                // Get team ID from URL if provided
                 const urlParams = new URLSearchParams(window.location.search);
                 const teamIdParam = urlParams.get('teamId');
                 
                 if (teamIdParam) {
-                    // Team ID provided in URL
-                    $scope.teamId = parseInt(teamIdParam);
-                } else {
-                    // Use user's favorite team
-                    const user = AuthService.getUser();
-                    $scope.teamId = user.favoriteTeam;
+                    // Team ID provided in URL, set it and search
+                    $scope.selectedTeamId = teamIdParam;
+                    $scope.searchTeamMatches();
                 }
-                
-                // Load team data
-                loadRecentMatches();
-                loadPointsTable();
             })
             .catch(() => {
                 // User is not authenticated, redirect to login
@@ -566,8 +610,13 @@ app.controller("TeamProfileController", function($scope, $http, $location, AuthS
             });
     }
 
-    // Load recent matches for the team
-    function loadRecentMatches() {
+    // Search for team matches
+    $scope.searchTeamMatches = function() {
+        if (!$scope.selectedTeamId) {
+            $scope.recentMatches = [];
+            return;
+        }
+
         const settings = {
             url: 'https://cricket-live-line1.p.rapidapi.com/recentMatches',
             method: 'GET',
@@ -580,68 +629,19 @@ app.controller("TeamProfileController", function($scope, $http, $location, AuthS
         $http(settings)
             .then(function(response) {
                 if (response.data && response.data.data) {
-                    // Filter matches for the team
+                    // Filter matches for the selected team
                     $scope.recentMatches = response.data.data.filter(match => 
-                        match.team_a_id === $scope.teamId || match.team_b_id === $scope.teamId
+                        match.team_a_id === parseInt($scope.selectedTeamId) || 
+                        match.team_b_id === parseInt($scope.selectedTeamId)
                     );
+                    console.log('Filtered matches:', $scope.recentMatches);
                 }
             })
             .catch(function(error) {
                 console.error('Error loading recent matches:', error);
+                alert('Error loading matches. Please try again later.');
             });
-    }
-
-    // Load points table
-    function loadPointsTable() {
-        const settings = {
-            url: 'https://cricket-live-line1.p.rapidapi.com/series/470/pointsTable',
-            method: 'GET',
-            headers: {
-                'x-rapidapi-key': '7fd9d9bf9amsh4fec798748ad712p13418fjsnbba51642c868',
-                'x-rapidapi-host': 'cricket-live-line1.p.rapidapi.com'
-            }
-        };
-
-        $http(settings)
-            .then(function(response) {
-                if (response.data && response.data.data && response.data.data.A) {
-                    // Sort teams by points (descending) and NRR (descending)
-                    $scope.teams = response.data.data.A.sort(function(a, b) {
-                        // Convert points to integers
-                        const pointsA = parseInt(a.Pts);
-                        const pointsB = parseInt(b.Pts);
-                        
-                        // Convert NRR to floating point numbers
-                        const nrrA = parseFloat(a.NRR);
-                        const nrrB = parseFloat(b.NRR);
-                        
-                        // First compare by points
-                        if (pointsA > pointsB) {
-                            // Team A has more points, so it should be ranked higher
-                            return -1; // -1 means A comes before B
-                        } else if (pointsA < pointsB) {
-                            // Team B has more points, so it should be ranked higher
-                            return 1; // 1 means B comes before A
-                        } else {
-                            // Points are equal, so compare by NRR
-                            if (nrrA > nrrB) {
-                                // Team A has higher NRR, so it should be ranked higher
-                                return -1;
-                            } else if (nrrA < nrrB) {
-                                // Team B has higher NRR, so it should be ranked higher
-                                return 1;
-                            } else {
-                                // Both points and NRR are equal
-                                return 0; // 0 means they are equal in ranking
-                            }
-                        }
-                    });
-                }
-            })
-            .catch(function(error) {
-                console.error('Error loading points table:', error);
-            });
-    }
+    };
 
     // Get team name based on team ID
     $scope.getTeamName = function(teamId) {
@@ -674,7 +674,7 @@ app.controller("TeamProfileController", function($scope, $http, $location, AuthS
             27: "https://documents.iplt20.com/ipl/MI/Logos/Logooutline/MIoutline.png",
             32: "https://documents.iplt20.com/ipl/KKR/Logos/Logooutline/KKRoutline.png"
         };
-        return teamLogoMap[teamId] || "https://documents.iplt20.com/ipl/CSK/logos/Logooutline/CSKoutline.png"; // Default to CSK logo if not found
+        return teamLogoMap[teamId] || "https://documents.iplt20.com/ipl/CSK/logos/Logooutline/CSKoutline.png";
     };
 
     // Initialize the controller

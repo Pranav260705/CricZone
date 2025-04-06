@@ -99,14 +99,12 @@
                 <div class="profile-info-item">
                     <div class="profile-info-label">Favorite Team</div>
                     <a href="team-profile.html?teamId={{user.favoriteTeam}}" class="team-link">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <div class="vn-team-logo">
-                                <img ng-src="{{getTeamLogoUrl(user.favoriteTeam)}}" alt="{{getTeamName(user.favoriteTeam)}}">
-                            </div>
-                            <div class="ap-team-contn col-100">
-                                <h3 class="mb-0">{{getTeamName(user.favoriteTeam)}}</h3>
-                                <p class="text-muted">Click to view team profile</p>
-                            </div>
+                        <div class="vn-team-logo">
+                            <img ng-src="{{getTeamLogoUrl(user.favoriteTeam)}}" alt="{{getTeamName(user.favoriteTeam)}}">
+                        </div>
+                        <div class="ap-team-contn">
+                            <h3>{{getTeamName(user.favoriteTeam)}}</h3>
+                            <p class="text-muted">Click to view team profile and recent matches</p>
                         </div>
                     </a>
                 </div>
